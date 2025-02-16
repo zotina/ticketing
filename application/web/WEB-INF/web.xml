@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
+<display-name>Application WEB</display-name>
+    <servlet>
+        <servlet-name>FrontController</servlet-name>
+        <servlet-class>framework.FrontController</servlet-class>
+        <init-param>
+            <param-name>packageController</param-name>
+            <param-value>mg.itu.java.controller</param-value>
+        </init-param>
+        <init-param>
+            <param-name>packageModel</param-name>
+            <param-value>mg.itu.java.model</param-value>
+        </init-param>
+        <init-param> 
+            <param-name>auth</param-name>
+            <param-value>auth</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FrontController</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>/assets/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>
