@@ -1,0 +1,103 @@
+package mg.itu.java.model;
+
+import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.sql.Date;
+
+public class Annulation_reservation{
+	String id_annulation_reservation;
+	double heur;
+	Date date_changement;
+
+	public Annulation_reservation(){
+	}
+
+	public Annulation_reservation(String id_annulation_reservation, double heur, Date date_changement) {
+		this.id_annulation_reservation = id_annulation_reservation;
+		this.heur = heur;
+		this.date_changement = date_changement;
+	}
+
+	public String getId_annulation_reservation() {
+		return this.id_annulation_reservation;
+	}
+
+	public double getHeur() {
+		return this.heur;
+	}
+
+	public Date getDate_changement() {
+		return this.date_changement;
+	}
+
+	public void setId_annulation_reservation(String newId_annulation_reservation) {
+		this.id_annulation_reservation = newId_annulation_reservation;
+	}
+
+	public void setHeur(double newHeur) {
+		this.heur = newHeur;
+	}
+
+	public void setDate_changement(Date newDate_changement) {
+		this.date_changement = newDate_changement;
+	}
+		
+	public void insert(Connection connection) throws Exception {
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        try {
+            String query = "INSERT INTO annulation_reservation (heur,date_changement) VALUES (?,?) RETURNING id_annulation_reservation";
+            statement = connection.prepareStatement(query);
+            statement.setDouble(1, getHeur());
+            statement.setDate(2, getDate_changement());
+            resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                this.id_annulation_reservation = resultSet.getString("id_annulation_reservation");
+            }
+            System.out.println("Données Annulation_reservation insérées avec succès");
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        } finally {
+            try {
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+                if (statement != null) {
+                    statement.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+	}
+	
+	public static List<Annulation_reservation> getAll(Connection connection) throws Exception {
+		List<Annulation_reservation> liste = new ArrayList<Annulation_reservation>();
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+		try {
+			String query = "SELECT * FROM annulation_reservation";
+			statement = connection.prepareStatement(query);
+			resultSet = statement.executeQuery();
+			while (resultSet.next()) {
+				Annulation_reservation instance = new Annulation_reservation();
+				instance.setId_annulation_reservation(resultSet.getString("id_annulation_reservation"));
+				instance.setHeur(resultSet.getDouble("heur"));
+				instance.setDate_changement(resultSet.getDate("date_changement"));
+				liste.add(instance);
+			}
+			return liste;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (resultSet != null) try { resultSet.close(); } catch (SQLException e) {}
+			if (statement != null) try { statement.close(); } catch (SQLException e) {}
+		}
+	}
+	
+}

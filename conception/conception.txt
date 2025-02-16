@@ -1,0 +1,107 @@
+CREATE TABLE Avion_(
+   id_avion VARCHAR(50) ,
+   date_fabrication DATE NOT NULL,
+   model VARCHAR(50)  NOT NULL,
+   PRIMARY KEY(id_avion)
+);
+
+CREATE TABLE Type_siege(
+   id_Type_siege VARCHAR(50) ,
+   libelle VARCHAR(50)  NOT NULL,
+   PRIMARY KEY(id_Type_siege)
+);
+
+CREATE TABLE ViIle(
+   id_ville VARCHAR(50) ,
+   nom VARCHAR(50)  NOT NULL,
+   PRIMARY KEY(id_ville)
+);
+
+CREATE TABLE Critere_reservation(
+   id_reservation VARCHAR(50) ,
+   heur NUMERIC(15,2)   NOT NULL,
+   date_changement DATE,
+   PRIMARY KEY(id_reservation)
+);
+
+CREATE TABLE Vol(
+   id_vol VARCHAR(50) ,
+   date_vol TIMESTAMP NOT NULL,
+   id_ville VARCHAR(50)  NOT NULL,
+   id_avion VARCHAR(50)  NOT NULL,
+   PRIMARY KEY(id_vol),
+   FOREIGN KEY(id_ville) REFERENCES ViIle(id_ville),
+   FOREIGN KEY(id_avion) REFERENCES Avion_(id_avion)
+);
+
+CREATE TABLE Promotion(
+   id_promotion VARCHAR(50) ,
+   date_promotion DATE,
+   id_vol VARCHAR(50)  NOT NULL,
+   PRIMARY KEY(id_promotion),
+   FOREIGN KEY(id_vol) REFERENCES Vol(id_vol)
+);
+
+CREATE TABLE annulation_reservation(
+   id_annulation_reservation VARCHAR(50) ,
+   heur NUMERIC(15,2)   NOT NULL,
+   date_changement DATE,
+   PRIMARY KEY(id_annulation_reservation)
+);
+
+CREATE TABLE Role(
+   id_role VARCHAR(50) ,
+   libelle VARCHAR(50)  NOT NULL,
+   PRIMARY KEY(id_role)
+);
+
+CREATE TABLE Utilisateur(
+   id_utilisateur VARCHAR(50) ,
+   email VARCHAR(50) ,
+   mdp VARCHAR(50) ,
+   nom VARCHAR(50) ,
+   id_role VARCHAR(50)  NOT NULL,
+   PRIMARY KEY(id_utilisateur),
+   FOREIGN KEY(id_role) REFERENCES Role(id_role)
+);
+
+CREATE TABLE Reservation(
+   id_reservation VARCHAR(50) ,
+   date_reservation TIMESTAMP NOT NULL,
+   prix NUMERIC(15,2)  ,
+   id_Type_siege VARCHAR(50)  NOT NULL,
+   id_vol VARCHAR(50)  NOT NULL,
+   id_utilisateur VARCHAR(50)  NOT NULL,
+   PRIMARY KEY(id_reservation),
+   FOREIGN KEY(id_Type_siege) REFERENCES Type_siege(id_Type_siege),
+   FOREIGN KEY(id_vol) REFERENCES Vol(id_vol),
+   FOREIGN KEY(id_utilisateur) REFERENCES Utilisateur(id_utilisateur)
+);
+
+CREATE TABLE Avion_siege(
+   id_avion VARCHAR(50) ,
+   id_Type_siege VARCHAR(50) ,
+   nbr_siege INTEGER NOT NULL,
+   PRIMARY KEY(id_avion, id_Type_siege),
+   FOREIGN KEY(id_avion) REFERENCES Avion_(id_avion),
+   FOREIGN KEY(id_Type_siege) REFERENCES Type_siege(id_Type_siege)
+);
+
+CREATE TABLE promotion_siege(
+   id_Type_siege VARCHAR(50) ,
+   id_promotion VARCHAR(50) ,
+   nbr_siege INTEGER NOT NULL,
+   promotion NUMERIC(15,2)   NOT NULL,
+   PRIMARY KEY(id_Type_siege, id_promotion),
+   FOREIGN KEY(id_Type_siege) REFERENCES Type_siege(id_Type_siege),
+   FOREIGN KEY(id_promotion) REFERENCES Promotion(id_promotion)
+);
+
+CREATE TABLE vol_siege(
+   id_Type_siege VARCHAR(50) ,
+   id_vol VARCHAR(50) ,
+   prix NUMERIC(15,2)   NOT NULL,
+   PRIMARY KEY(id_Type_siege, id_vol),
+   FOREIGN KEY(id_Type_siege) REFERENCES Type_siege(id_Type_siege),
+   FOREIGN KEY(id_vol) REFERENCES Vol(id_vol)
+);
