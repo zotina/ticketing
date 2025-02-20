@@ -158,6 +158,38 @@ public class Reservation{
 		}
 	}
 
+	public static List<Reservation> getByUser(String u ,Connection connection) throws Exception {
+		List<Reservation> liste = new ArrayList<Reservation>();
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+		try {
+			String query = "SELECT * FROM reservation where id_utilisateur = ? ";
+			statement = connection.prepareStatement(query);
+			statement.setString(1, u);
+			resultSet = statement.executeQuery();
+			while (resultSet.next()) {
+				Reservation instance = new Reservation();
+				instance.setId_reservation(resultSet.getString("id_reservation"));
+				instance.setDate_reservation(resultSet.getString("date_reservation"));
+				instance.setPrix(resultSet.getDouble("prix"));
+				Type_siege type_siege = Type_siege.getById(resultSet.getString("id_type_siege"),connection);
+				instance.setType_siege(type_siege);
+				Vol vol = Vol.getById(resultSet.getString("id_vol"),connection);
+				instance.setVol(vol);
+				Utilisateur utilisateur = Utilisateur.getById(resultSet.getString("id_utilisateur"),connection);
+				instance.setUtilisateur(utilisateur);
+				liste.add(instance);
+			}
+			return liste;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (resultSet != null) try { resultSet.close(); } catch (SQLException e) {}
+			if (statement != null) try { statement.close(); } catch (SQLException e) {}
+		}
+	}
+
 	public LocalDateTime getDate_reservation() {
 		return date_reservation;
 	}
@@ -178,4 +210,36 @@ public class Reservation{
 			}
 		}
 	}
+
+	public static Reservation getById(String id,Connection connection) throws Exception {
+		Reservation instance = null;
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+		try {
+			String query = "SELECT * FROM reservation WHERE id_reservation = ?";
+			statement = connection.prepareStatement(query);
+			statement.setString(1, id);
+			resultSet = statement.executeQuery();
+			if (resultSet.next()) {
+				instance = new Reservation();
+				instance.setId_reservation(resultSet.getString("id_reservation"));
+				instance.setDate_reservation(resultSet.getString("date_reservation"));
+				instance.setPrix(resultSet.getDouble("prix"));
+				Type_siege type_siege = Type_siege.getById(resultSet.getString("id_type_siege"),connection);
+				instance.setType_siege(type_siege);
+				Vol vol = Vol.getById(resultSet.getString("id_vol"),connection);
+				instance.setVol(vol);
+				Utilisateur utilisateur = Utilisateur.getById(resultSet.getString("id_utilisateur"),connection);
+				instance.setUtilisateur(utilisateur);
+			}
+			return instance;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (resultSet != null) try { resultSet.close(); } catch (SQLException e) {}
+			if (statement != null) try { statement.close(); } catch (SQLException e) {}
+		}
+	}
+	
 }

@@ -103,6 +103,12 @@
                 </a>
                 <ul id="reservation-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
                     <li>
+                        <a href="reservation_list">
+                            <i class="bi bi-circle"></i><span>list</span>
+                        </a>
+                    </li>
+
+                    <li>
                         <a href="reservation_form">
                             <i class="bi bi-circle"></i><span>form</span>
                         </a>

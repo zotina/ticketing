@@ -48,6 +48,16 @@
 								</select>
 							</div>
 
+							<div class="mb-3">
+								<label class="form-label">Promotion</label>
+								<br>
+								<input type="radio" id="promotionOui" name="enPromotion" value="true">
+								<label class="form-check-label" for="promotionOui">Oui</label>
+
+								<input type="radio" id="promotionNon" name="enPromotion" value="false">
+								<label class="form-check-label" for="promotionNon">Non</label>
+							</div>
+
 							<button type="submit" class="btn btn-primary">
 								Search
 							</button>
@@ -74,33 +84,38 @@
 							</thead>
 							<tbody>
 								<% for(Vol vol : volList) { %>
-									<tr>
-										<td><%= vol.getId_vol() %></td>
-										<td><%= vol.getDate_vol() %></td>
-										<td><%= vol.getVille().getNom() %></td>
-										<td><%= vol.getAvion().getModel() %></td>
-										<td>
-											<% 
-												List<Vol_siege> sieges = volSiegeList.stream()
-													.filter(vs -> vs.getVol().getId_vol().equals(vol.getId_vol()))
-													.collect(java.util.stream.Collectors.toList());
-												for(Vol_siege siege : sieges) {
-											%>
-												<div>
-													<%= siege.getType_siege().getLibelle() %> : <%= siege.getPrix() %> Ar
-												</div>
-											<% } %>
-										</td>
-										<% if ("admin".equalsIgnoreCase((String) request.getSession().getAttribute("auth"))) { %>
-										<td>
-												<a href="vol_update?id_vol=<%= vol.getId_vol() %>" class="btn btn-warning btn-sm">Modifier</a>
-												<a href="vol_delete?id_vol=<%= vol.getId_vol() %>" class="btn btn-danger btn-sm" 
-												   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce vol ?')">Supprimer</a>
-										</td>
+								<tr>
+									<td>
+										<%= vol.getId_vol() %>
+										<% if (vol.estEnPromotion()) { %>
+											<span class="badge bg-danger">Promo</span>
 										<% } %>
-									</tr>
+									</td>
+									<td><%= vol.getDate_vol() %></td>
+									<td><%= vol.getVille().getNom() +" - "+ vol.getVille1().getNom() %></td>
+									<td><%= vol.getAvion().getModel() %></td>
+									<td>
+									<%
+									List<Vol_siege> sieges = volSiegeList.stream()
+									.filter(vs -> vs.getVol().getId_vol().equals(vol.getId_vol()))
+									.collect(java.util.stream.Collectors.toList());
+									for(Vol_siege siege : sieges) {
+									%>
+									<div>
+									<%= siege.getType_siege().getLibelle() %> : <%= siege.getPrix() %> Ar
+									</div>
+									<% } %>
+									</td>
+									<% if ("admin".equalsIgnoreCase((String) request.getSession().getAttribute("auth"))) { %>
+									<td>
+									<a href="vol_update?id_vol=<%= vol.getId_vol() %>" class="btn btn-warning btn-sm">Modifier</a>
+									<a href="vol_delete?id_vol=<%= vol.getId_vol() %>" class="btn btn-danger btn-sm"
+									onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce vol ?')">Supprimer</a>
+									</td>
+									<% } %>
+								</tr>
 								<% } %>
-							</tbody>
+								</tbody>
 						</table>
 					</div>
 				</div>

@@ -49,7 +49,7 @@
 							<option value="">Sélectionner un vol</option>
 							<% for(Vol vol : volList) { %>
 								<option value="<%= vol.getId_vol() %>">
-									<%= vol.getAvion().getModel() + " - " + vol.getVille().getNom() %>
+									<%= vol.getLibelle()%>
 								</option>
 							<% } %>
 						</select>

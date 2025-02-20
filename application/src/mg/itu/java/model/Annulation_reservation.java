@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.sql.Date;
 
@@ -100,4 +102,29 @@ public class Annulation_reservation{
 		}
 	}
 	
+	public static Annulation_reservation getbyDate(LocalDateTime date,Connection connection) throws Exception {
+		Annulation_reservation instance = null;
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+		try {
+			String query = "SELECT * FROM annulation_reservation where date_changement <= ? order  by date_changement DESC limit 1";
+			statement = connection.prepareStatement(query);
+			statement.setTimestamp(1, Timestamp.valueOf(date));
+			resultSet = statement.executeQuery();
+			if (resultSet.next()) {
+				instance = new Annulation_reservation();
+				instance.setId_annulation_reservation(resultSet.getString("id_annulation_reservation"));
+				instance.setHeur(resultSet.getDouble("heur"));
+				instance.setDate_changement(resultSet.getDate("date_changement"));
+			}
+			return instance;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (resultSet != null) try { resultSet.close(); } catch (SQLException e) {}
+			if (statement != null) try { statement.close(); } catch (SQLException e) {}
+		}
+	}
+
 }

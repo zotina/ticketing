@@ -23,6 +23,8 @@ public class Utilisateur{
 	
 	Role role ;
 
+	String passport;
+
 	public Utilisateur(){
 	}
 
@@ -34,6 +36,7 @@ public class Utilisateur{
 		this.role = role;
 	}
 
+	
 	public String getId_utilisateur() {
 		return this.id_utilisateur;
 	}
@@ -78,11 +81,12 @@ public class Utilisateur{
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         try {
-            String query = "INSERT INTO utilisateur (email,mdp,nom,id_role) VALUES (?,?,?,(select id_role from Role where libelle = 'admin')) RETURNING id_utilisateur";
+            String query = "INSERT INTO utilisateur (email,mdp,nom,id_role,passport) VALUES (?,?,?,(select id_role from Role where libelle = 'admin'),?) RETURNING id_utilisateur";
             statement = connection.prepareStatement(query);
             statement.setString(1, getEmail());
             statement.setString(2, getMdp());
             statement.setString(3, getNom());
+			statement.setString(4, getPassport());
             resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 this.id_utilisateur = resultSet.getString("id_utilisateur");
@@ -164,5 +168,13 @@ public class Utilisateur{
 			if (resultSet != null) try { resultSet.close(); } catch (SQLException e) {}
 			if (statement != null) try { statement.close(); } catch (SQLException e) {}
 		}
+	}
+
+	public String getPassport() {
+		return passport;
+	}
+
+	public void setPassport(String passport) {
+		this.passport = passport;
 	}
 }

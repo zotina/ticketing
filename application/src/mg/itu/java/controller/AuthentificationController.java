@@ -9,6 +9,7 @@ import framework.Annotation.Email;
 import framework.Annotation.NotNull;
 import framework.Annotation.Valid;
 import mg.itu.java.database.Connexion;
+import framework.FileUpload;
 import mg.itu.java.model.Utilisateur;
 
 import java.sql.Connection;
@@ -111,11 +112,12 @@ public class AuthentificationController {
 
     @Url("/process_sign_up")
     @Post
-    public ModelView process_sign_up(@Valid @Param("utilisateur") Utilisateur u ) {
+    public ModelView process_sign_up(@Valid @Param("utilisateur") Utilisateur u ,@Param("passport")FileUpload passeport) {
         ModelView modelview = new ModelView();
         Connection conn = new Connexion().connect_to_postgres();
         try {
-            
+            System.out.println(passeport.getPath());
+            u.setPassport(passeport.getPath());
             u.insert(conn);
             modelview.setUrl("./page/user/login_utilisateur.jsp");
         } catch (Exception e) {

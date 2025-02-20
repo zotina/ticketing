@@ -34,13 +34,27 @@
 				</div>
 
 				<div class="mb-3">
-					<label class="form-label">Ville</label>
+					<label class="form-label">Ville depart</label>
 					<select class="form-select" name="vol.ville.id_ville" required>
 						<option value="">Sélectionner une ville</option>
 						<% for(Ville ville : villeList) { %>
 							<option value="<%= ville.getId_ville() %>" 
 								<%= (vol != null && vol.getVille() != null && 
 									ville.getId_ville().equals(vol.getVille().getId_ville())) ? "selected" : "" %>>
+								<%= ville.getNom() %>
+							</option>
+						<% } %>
+					</select>
+				</div>
+
+				<div class="mb-3">
+					<label class="form-label">Ville destination</label>
+					<select class="form-select" name="vol.ville1.id_ville" required>
+						<option value="">Sélectionner une ville</option>
+						<% for(Ville ville : villeList) { %>
+							<option value="<%= ville.getId_ville() %>" 
+								<%= (vol != null && vol.getVille1() != null && 
+									ville.getId_ville().equals(vol.getVille1().getId_ville())) ? "selected" : "" %>>
 								<%= ville.getNom() %>
 							</option>
 						<% } %>

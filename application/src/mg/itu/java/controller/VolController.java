@@ -1,6 +1,7 @@
 package mg.itu.java.controller;
 import framework.ModelView;
 import framework.Annotation.Url;
+import framework.Annotation.RestApi;
 import framework.Annotation.Auth;
 import framework.Annotation.Param;
 import framework.Annotation.Controller;
@@ -19,6 +20,27 @@ import framework.Annotation.Post;
 
 @Controller
 public class VolController {
+    @Url("/vol_rest")
+    @RestApi
+    public ModelView listRest() {
+        ModelView modelview = new ModelView();
+        Connection conn = new Connexion().connect_to_postgres();
+        try {
+            modelview.add("volList", Vol.getAll(conn));
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return modelview;
+    }
+
     @Url("/vol_list")
     public ModelView list() {
         ModelView modelview = new ModelView("./page/vol/vol.jsp");
@@ -230,7 +252,7 @@ public class VolController {
 
     @Url("/vol_search")
     public ModelView search(@Param("dateDebut")LocalDateTime dateDebut,@Param("dateFin")LocalDateTime dateFin, 
-    @Param("id_ville")String idVille,@Param("id_avion") String idAvion) {
+    @Param("id_ville")String idVille,@Param("id_avion") String idAvion,@Param("enPromotion") boolean enPromotion) {
         ModelView modelview = new ModelView("./page/vol/vol.jsp");
         Connection conn = new Connexion().connect_to_postgres();
         try {
@@ -238,7 +260,7 @@ public class VolController {
             modelview.add("avionList", Avion.getAll(conn));
             modelview.add("volSiegeList", Vol_siege.getAll(conn));
             modelview.add("typeSiegeList", Type_siege.getAll(conn));
-            modelview.add("volList",Vol.multiCritere(conn, dateDebut, dateFin, idVille, idAvion));
+            modelview.add("volList",Vol.multiCritere(conn, dateDebut, dateFin, idVille, idAvion,enPromotion));
         } catch (Exception e) {
             
         }finally {

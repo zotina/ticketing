@@ -57,7 +57,7 @@ String error = (String) request.getAttribute("error");
             <div class="row w-100">
                 <div class="col-md-8">
                     <h2 class="text-center">Inscription</h2>
-                    <form action="process_sign_up" method="post">
+                    <form action="process_sign_up" method="post" enctype="multipart/form-data">
                         <% if (error != null) { %>
                             <div class="alert alert-danger">
                                 <%= error %>
@@ -99,7 +99,10 @@ String error = (String) request.getAttribute("error");
                             <input type="password" class="form-control" name="utilisateur.mdp" id="mdp" 
                                    value="<%= (mdpValue != null) ? mdpValue : "" %>">
                         </div>
-
+                        <div class="form-group">
+                            <label for="passport">Passeport :</label>
+                            <input type="file" class="form-control" name="passport" id="passport">
+                        </div>
                         <!-- Bouton de Soumission -->
                         <button type="submit" class="btn btn-primary w-100">Inscription</button>
                     </form>
