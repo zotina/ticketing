@@ -28,10 +28,12 @@ CREATE TABLE Vol(
    id_vol VARCHAR(50) ,
    date_vol TIMESTAMP NOT NULL,
    id_ville VARCHAR(50)  NOT NULL,
+   id_ville_1 VARCHAR(50)  NOT NULL,
    id_avion VARCHAR(50)  NOT NULL,
    PRIMARY KEY(id_vol),
-   FOREIGN KEY(id_ville) REFERENCES Ville(id_ville),
-   FOREIGN KEY(id_avion) REFERENCES Avion(id_avion)
+   FOREIGN KEY(id_ville) REFERENCES Ville(id_ville) ON DELETE CASCADE,  
+   FOREIGN KEY(id_ville_1) REFERENCES Ville(id_ville) ON DELETE CASCADE,
+   FOREIGN KEY(id_avion) REFERENCES Avion(id_avion) ON DELETE CASCADE
 );
 
 CREATE TABLE Promotion(
@@ -39,7 +41,7 @@ CREATE TABLE Promotion(
    date_promotion DATE,
    id_vol VARCHAR(50)  NOT NULL,
    PRIMARY KEY(id_promotion),
-   FOREIGN KEY(id_vol) REFERENCES Vol(id_vol)
+   FOREIGN KEY(id_vol) REFERENCES Vol(id_vol) ON DELETE CASCADE
 );
 
 CREATE TABLE annulation_reservation(
@@ -62,7 +64,7 @@ CREATE TABLE Utilisateur(
    nom VARCHAR(50) ,
    id_role VARCHAR(50)  NOT NULL,
    PRIMARY KEY(id_utilisateur),
-   FOREIGN KEY(id_role) REFERENCES Role(id_role)
+   FOREIGN KEY(id_role) REFERENCES Role(id_role) ON DELETE CASCADE
 );
 
 CREATE TABLE Reservation(
@@ -73,18 +75,18 @@ CREATE TABLE Reservation(
    id_vol VARCHAR(50)  NOT NULL,
    id_utilisateur VARCHAR(50)  NOT NULL,
    PRIMARY KEY(id_reservation),
-   FOREIGN KEY(id_Type_siege) REFERENCES Type_siege(id_Type_siege),
-   FOREIGN KEY(id_vol) REFERENCES Vol(id_vol),
-   FOREIGN KEY(id_utilisateur) REFERENCES Utilisateur(id_utilisateur)
+   FOREIGN KEY(id_Type_siege) REFERENCES Type_siege(id_Type_siege) ON DELETE CASCADE,
+   FOREIGN KEY(id_vol) REFERENCES Vol(id_vol) ON DELETE CASCADE,
+   FOREIGN KEY(id_utilisateur) REFERENCES Utilisateur(id_utilisateur) ON DELETE CASCADE
 );
 
-CREATE TABLE Avionsiege(
+CREATE TABLE Avion_siege(
    id_avion VARCHAR(50) ,
    id_Type_siege VARCHAR(50) ,
    nbr_siege INTEGER NOT NULL,
    PRIMARY KEY(id_avion, id_Type_siege),
-   FOREIGN KEY(id_avion) REFERENCES Avion(id_avion),
-   FOREIGN KEY(id_Type_siege) REFERENCES Type_siege(id_Type_siege)
+   FOREIGN KEY(id_avion) REFERENCES Avion(id_avion) ON DELETE CASCADE,
+   FOREIGN KEY(id_Type_siege) REFERENCES Type_siege(id_Type_siege) ON DELETE CASCADE
 );
 
 CREATE TABLE promotion_siege(
@@ -93,8 +95,8 @@ CREATE TABLE promotion_siege(
    nbr_siege INTEGER NOT NULL,
    promotion NUMERIC(15,2)   NOT NULL,
    PRIMARY KEY(id_Type_siege, id_promotion),
-   FOREIGN KEY(id_Type_siege) REFERENCES Type_siege(id_Type_siege),
-   FOREIGN KEY(id_promotion) REFERENCES Promotion(id_promotion)
+   FOREIGN KEY(id_Type_siege) REFERENCES Type_siege(id_Type_siege) ON DELETE CASCADE,
+   FOREIGN KEY(id_promotion) REFERENCES Promotion(id_promotion) ON DELETE CASCADE
 );
 
 CREATE TABLE vol_siege(
@@ -102,6 +104,10 @@ CREATE TABLE vol_siege(
    id_vol VARCHAR(50) ,
    prix NUMERIC(15,2)   NOT NULL,
    PRIMARY KEY(id_Type_siege, id_vol),
-   FOREIGN KEY(id_Type_siege) REFERENCES Type_siege(id_Type_siege),
-   FOREIGN KEY(id_vol) REFERENCES Vol(id_vol)
+   FOREIGN KEY(id_Type_siege) REFERENCES Type_siege(id_Type_siege) ON DELETE CASCADE,
+   FOREIGN KEY(id_vol) REFERENCES Vol(id_vol) ON DELETE CASCADE
 );
+
+
+ALTER TABLE vol add COLUMN enPromotion BOOLEAN DEFAULT FALSE;
+ALTER TABLE Utilisateur add COLUMN passport VARCHAR(255); 

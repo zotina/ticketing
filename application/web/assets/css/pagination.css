@@ -1,0 +1,31 @@
+.pagination {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+  }
+  
+  .pagination li {
+    margin: 0 0.25rem;
+  }
+  
+  .pagination li a,
+  .pagination li span {
+    color: #007bff; /* Couleur de texte des liens */
+    background-color: #fff; /* Couleur de fond des liens */
+    border: 1px solid #dee2e6; /* Bordure des liens */
+    padding: 0.5rem 0.75rem;
+    text-decoration: none;
+  }
+  
+  .pagination li a:hover,
+  .pagination li a:focus,
+  .pagination li span:hover,
+  .pagination li span:focus {
+    background-color: #e9ecef;
+  }
+  
+  .pagination .active a {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+  }

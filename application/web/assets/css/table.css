@@ -1,0 +1,54 @@
+.table-container {
+    background-color: #fff; /* Changer la couleur du div */
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 18px;
+    text-align: left;
+}
+
+.table th, .table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+}
+
+.table thead th {
+    background-color: #f4f4f4;
+    color: #333;
+    font-weight: bold;
+}
+
+.table tbody tr:nth-of-type(even) {
+    background-color: #f9f9f9;
+}
+
+.table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Icon styles */
+.far {
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.far.fa-edit {
+    color: #4CAF50; /* Green color for edit icon */
+}
+
+.far.fa-edit:hover {
+    color: #388E3C; /* Darker green on hover */
+}
+
+.far.fa-trash-alt {
+    color: #F44336; /* Red color for delete icon */
+}
+
+.far.fa-trash-alt:hover {
+    color: #D32F2F; /* Darker red on hover */
+}

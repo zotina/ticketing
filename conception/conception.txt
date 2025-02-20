@@ -1,4 +1,4 @@
-CREATE TABLE Avion_(
+CREATE TABLE Avion(
    id_avion VARCHAR(50) ,
    date_fabrication DATE NOT NULL,
    model VARCHAR(50)  NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE Type_siege(
    PRIMARY KEY(id_Type_siege)
 );
 
-CREATE TABLE ViIle(
+CREATE TABLE Ville(
    id_ville VARCHAR(50) ,
    nom VARCHAR(50)  NOT NULL,
    PRIMARY KEY(id_ville)
@@ -28,10 +28,12 @@ CREATE TABLE Vol(
    id_vol VARCHAR(50) ,
    date_vol TIMESTAMP NOT NULL,
    id_ville VARCHAR(50)  NOT NULL,
+   id_ville_1 VARCHAR(50)  NOT NULL,
    id_avion VARCHAR(50)  NOT NULL,
    PRIMARY KEY(id_vol),
-   FOREIGN KEY(id_ville) REFERENCES ViIle(id_ville),
-   FOREIGN KEY(id_avion) REFERENCES Avion_(id_avion)
+   FOREIGN KEY(id_ville) REFERENCES Ville(id_ville),
+   FOREIGN KEY(id_ville_1) REFERENCES Ville(id_ville),
+   FOREIGN KEY(id_avion) REFERENCES Avion(id_avion)
 );
 
 CREATE TABLE Promotion(
@@ -83,7 +85,7 @@ CREATE TABLE Avion_siege(
    id_Type_siege VARCHAR(50) ,
    nbr_siege INTEGER NOT NULL,
    PRIMARY KEY(id_avion, id_Type_siege),
-   FOREIGN KEY(id_avion) REFERENCES Avion_(id_avion),
+   FOREIGN KEY(id_avion) REFERENCES Avion(id_avion),
    FOREIGN KEY(id_Type_siege) REFERENCES Type_siege(id_Type_siege)
 );
 

@@ -58,6 +58,11 @@ public class Promotion{
             if (resultSet.next()) {
                 this.id_promotion = resultSet.getString("id_promotion");
             }
+			
+			Vol vol = Vol.getById(this.vol.getId_vol(), connection);
+			vol.setEnPromotion(true);
+			vol.update(connection);
+
             System.out.println("Données Promotion insérées avec succès");
         } catch (Exception e) {
             throw new Exception(e.getMessage());

@@ -74,11 +74,13 @@ public class Vol_siege{
 	public void update(Connection connection) throws Exception {
         PreparedStatement statement = null;
         try {
-            String query = "UPDATE vol_siege SET id_vol = ?, prix = ? WHERE id_type_siege = ?";
+            String query = "UPDATE vol_siege SET id_vol = ?, prix = ?, id_type_siege = ? WHERE id_type_siege = ? and id_vol = ?";
             statement = connection.prepareStatement(query);
             statement.setString(1, this.vol.getId_vol());
             statement.setDouble(2, getPrix());
             statement.setString(3, getType_siege().getId_type_siege());
+			statement.setString(4, getType_siege().getId_type_siege());
+			statement.setString(5, this.vol.getId_vol());
             statement.executeUpdate();
             System.out.println("Données Vol_siege mises à jour avec succès");
         } catch (Exception e) {
@@ -167,6 +169,7 @@ public class Vol_siege{
 			if (statement != null) try { statement.close(); } catch (SQLException e) {}
 		}
 	}
+
 	public static List<Vol_siege> getByVolId(String id_vol,Connection connection) throws Exception {
 		List<Vol_siege> liste = new ArrayList<Vol_siege>();
 		PreparedStatement statement = null;
@@ -194,4 +197,28 @@ public class Vol_siege{
 			if (statement != null) try { statement.close(); } catch (SQLException e) {}
 		}
 	}
+
+	public double get_promotion_vol_siege(Connection connection) throws Exception {
+		double resultat = 0.0;
+		PreparedStatement statement = null;
+		ResultSet resultSet = null;
+		try {
+			String query = "SELECT get_promotion_vol_siege(?,?) as nbr_siege";
+			statement = connection.prepareStatement(query);
+			statement.setString(1, vol.getId_vol());
+			statement.setString(2, type_siege.getId_type_siege());
+			resultSet = statement.executeQuery();
+			if (resultSet.next()) {
+				resultat = resultSet.getDouble("nbr_siege");			
+			}
+			return resultat;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		} finally {
+			if (resultSet != null) try { resultSet.close(); } catch (SQLException e) {}
+			if (statement != null) try { statement.close(); } catch (SQLException e) {}
+		}
+	}
+	
 }

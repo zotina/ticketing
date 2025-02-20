@@ -1,37 +1,48 @@
-package mg.itu.java.model;
+	package mg.itu.java.model;
 
-import java.util.List;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.sql.Timestamp;
+	import java.util.List;
+	import java.sql.Connection;
+	import java.sql.PreparedStatement;
+	import java.sql.ResultSet;
+	import java.sql.SQLException;
+	import java.util.ArrayList;
+	import java.time.LocalDateTime;
+	import java.time.format.DateTimeFormatter;
+	import java.time.format.DateTimeParseException;
+	import java.sql.Timestamp;
 
-public class Vol{
-	String id_vol;
-	LocalDateTime date_vol;
-	Ville ville ;
-	Avion avion ;
+	public class Vol{
+		String id_vol;
+		LocalDateTime date_vol;
+		Ville ville ;
+		Ville ville1 ;
+		Avion avion ;
+		boolean enPromotion;
 
 	public Vol(){
 	}
 
-	public Vol(String id_vol, LocalDateTime date_vol, Ville ville, Avion avion) {
+	public Vol(String id_vol, LocalDateTime date_vol, Ville ville,Ville ville1, Avion avion) {
 		this.id_vol = id_vol;
 		this.date_vol = date_vol;
 		this.ville = ville;
+		this.ville1 = ville1;
 		this.avion = avion;
+	}
+	
+	public boolean estEnPromotion() {
+		return enPromotion;
+	}
+
+	public void setEnPromotion(boolean enPromotion) {
+		this.enPromotion = enPromotion;
 	}
 
 	public String getId_vol() {
 		return this.id_vol;
 	}
 	public String getLibelle(){
-		return ville.getNom() + " - " + avion.getModel() + " - " + date_vol;
+		return ville.getNom() +" => "+ ville1.getNom() +" : " + avion.getModel() + " - " + date_vol;
 	}
 	public LocalDateTime getDate_vol() {
 		return this.date_vol;
@@ -73,17 +84,26 @@ public class Vol{
 	public void setAvion(Avion avion) {
 		this.avion = avion;
 	}
+	
+	public Ville getVille1() {
+		return ville1;
+	}
+
+	public void setVille1(Ville ville1) {
+		this.ville1 = ville1;
+	}
 
 	public void insert(Connection connection) throws Exception {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
         try {
-            String query = "INSERT INTO vol (date_vol,id_ville,id_avion) VALUES (?,?,?) RETURNING id_vol";
+            String query = "INSERT INTO vol (date_vol,id_ville,id_avion,id_ville_1) VALUES (?,?,?,?) RETURNING id_vol";
             statement = connection.prepareStatement(query);
 			System.out.println(getDate_vol());
             statement.setTimestamp(1, Timestamp.valueOf(getDate_vol()));
             statement.setString(2, this.ville.getId_ville());
             statement.setString(3, this.avion.getId_avion());
+            statement.setString(4, this.ville1.getId_ville());
             resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 this.id_vol = resultSet.getString("id_vol");
@@ -108,12 +128,14 @@ public class Vol{
 	public void update(Connection connection) throws Exception {
         PreparedStatement statement = null;
         try {
-            String query = "UPDATE vol SET date_vol = ?, id_ville = ?, id_avion = ? WHERE id_vol = ?";
+            String query = "UPDATE vol SET date_vol = ?, id_ville = ?,id_ville_1 = ?, id_avion = ?,enPromotion = ? WHERE id_vol = ?";
             statement = connection.prepareStatement(query);
             statement.setTimestamp(1, Timestamp.valueOf(getDate_vol()));
             statement.setString(2, this.ville.getId_ville());
-            statement.setString(3, this.avion.getId_avion());
-            statement.setString(4, getId_vol());
+			statement.setString(3, this.ville1.getId_ville());
+            statement.setString(4, this.avion.getId_avion());
+			statement.setBoolean(5, enPromotion);
+            statement.setString(6, getId_vol());
             statement.executeUpdate();
             System.out.println("Données Vol mises à jour avec succès");
         } catch (Exception e) {
@@ -160,10 +182,13 @@ public class Vol{
 			resultSet = statement.executeQuery();
 			while (resultSet.next()) {
 				Vol instance = new Vol();
+				instance.setEnPromotion(resultSet.getBoolean("enPromotion"));
 				instance.setId_vol(resultSet.getString("id_vol"));
 				instance.setDate_vol(resultSet.getString("date_vol"));
 				Ville ville = Ville.getById(resultSet.getString("id_ville"),connection);
 				instance.setVille(ville);
+				Ville ville1 = Ville.getById(resultSet.getString("id_ville_1"),connection);
+				instance.setVille1(ville1);
 				Avion avion = Avion.getById(resultSet.getString("id_avion"),connection);
 				instance.setAvion(avion);
 				liste.add(instance);
@@ -192,6 +217,8 @@ public class Vol{
 				instance.setDate_vol(resultSet.getString("date_vol"));
 				Ville ville = Ville.getById(resultSet.getString("id_ville"),connection);
 				instance.setVille(ville);
+				Ville ville1 = Ville.getById(resultSet.getString("id_ville_1"),connection);
+				instance.setVille1(ville1);
 				Avion avion = Avion.getById(resultSet.getString("id_avion"),connection);
 				instance.setAvion(avion);
 			}
@@ -204,8 +231,9 @@ public class Vol{
 			if (statement != null) try { statement.close(); } catch (SQLException e) {}
 		}
 	}
+
 	public static List<Vol> multiCritere(Connection connection, LocalDateTime dateDebut, 
-		LocalDateTime dateFin, String idVille, String idAvion) throws Exception {
+		LocalDateTime dateFin, String idVille, String idAvion,boolean enPromotion) throws Exception {
 		List<Vol> liste = new ArrayList<Vol>();
 		PreparedStatement statement = null;
 		ResultSet resultSet = null;
@@ -214,7 +242,6 @@ public class Vol{
 			StringBuilder query = new StringBuilder("SELECT * FROM vol WHERE 1=1");
 			List<Object> params = new ArrayList<>();
 			
-			// Ajouter les conditions si les paramètres ne sont pas null
 			if (dateDebut != null) {
 				query.append(" AND date_vol >= ?");
 				params.add(Timestamp.valueOf(dateDebut));
@@ -226,7 +253,12 @@ public class Vol{
 			}
 			
 			if (idVille != null && !idVille.trim().isEmpty()) {
-				query.append(" AND id_ville = ?");
+				query.append(" AND ( id_ville = ? ");
+				params.add(idVille);
+			}
+
+			if (idVille != null && !idVille.trim().isEmpty()) {
+				query.append(" OR id_ville_1 = ? ) ");
 				params.add(idVille);
 			}
 			
@@ -235,12 +267,15 @@ public class Vol{
 				params.add(idAvion);
 			}
 			
-			// Ajouter ORDER BY date_vol pour avoir un résultat ordonné
+			if (enPromotion) {
+				query.append(" AND enPromotion = ?");
+				params.add(enPromotion);
+			}
+
 			query.append(" ORDER BY date_vol");
 			
 			statement = connection.prepareStatement(query.toString());
 			
-			// Définir les paramètres
 			for (int i = 0; i < params.size(); i++) {
 				statement.setObject(i + 1, params.get(i));
 			}
@@ -253,6 +288,8 @@ public class Vol{
 				instance.setDate_vol(resultSet.getString("date_vol"));
 				Ville ville = Ville.getById(resultSet.getString("id_ville"), connection);
 				instance.setVille(ville);
+				Ville ville1 = Ville.getById(resultSet.getString("id_ville_1"),connection);
+				instance.setVille1(ville1);
 				Avion avion = Avion.getById(resultSet.getString("id_avion"), connection);
 				instance.setAvion(avion);
 				liste.add(instance);
