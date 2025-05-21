@@ -1,14 +1,13 @@
 package mg.itu.java.model;
 
-import java.util.List;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import framework.Annotation.Email;
 import framework.Annotation.NotNull;
 import framework.Annotation.Size;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class Utilisateur{
 	String id_utilisateur;
@@ -136,30 +135,32 @@ public class Utilisateur{
 		}
 	}
 
-	public static Utilisateur authentification(String email,String mdp,Connection connection,String role_name) throws Exception {
+	public static Utilisateur authentification(String email, String mdp, Connection connection, String role_name) throws Exception {
 		Utilisateur instance = null;
 		PreparedStatement statement = null;
 		ResultSet resultSet = null;
 		try {
-			String query = "SELECT * FROM utilisateur WHERE email = ? and mdp = ? ";
+			String query = "SELECT * FROM utilisateur WHERE email like ?";
 			statement = connection.prepareStatement(query);
 			statement.setString(1, email);
-			statement.setString(2, mdp);
 			resultSet = statement.executeQuery();
+	
 			if (resultSet.next()) {
-				Role role = Role.getById(resultSet.getString("id_role"),connection);
+				String hashedPassword = resultSet.getString("mdp");
+	
+				if (!BCrypt.checkpw(mdp, hashedPassword)) {
+					return null; 
+				}
+	
+				Role role = Role.getById(resultSet.getString("id_role"), connection);
 				instance = new Utilisateur();
 				instance.setId_utilisateur(resultSet.getString("id_utilisateur"));
 				instance.setEmail(resultSet.getString("email"));
 				instance.setMdp(resultSet.getString("mdp"));
 				instance.setNom(resultSet.getString("nom"));
 				instance.setRole(role);
-
-				System.out.println(role_name);
-				System.out.println(role.getLibelle());
-				if(role_name!= null &&  !role_name.equals("")  && !role_name.equalsIgnoreCase(role.getLibelle()) )
-					return null;
 			}
+	
 			return instance;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -169,6 +170,8 @@ public class Utilisateur{
 			if (statement != null) try { statement.close(); } catch (SQLException e) {}
 		}
 	}
+	
+	
 
 	public String getPassport() {
 		return passport;

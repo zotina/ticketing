@@ -7,6 +7,7 @@ import framework.Annotation.Param;
 import framework.Annotation.Controller;
 import mg.itu.java.database.Connexion;
 import mg.itu.java.model.Avion;
+import mg.itu.java.model.Classe;
 import mg.itu.java.model.Ville;
 import mg.itu.java.model.Vol_siege;
 import mg.itu.java.model.Type_siege;
@@ -74,6 +75,7 @@ public class VolController {
             modelview.add("villeList", Ville.getAll(conn));
             modelview.add("avionList", Avion.getAll(conn));
             modelview.add("typeSiegeList", Type_siege.getAll(conn));
+            modelview.add("classeList", Classe.getAll(conn));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -109,12 +111,7 @@ public class VolController {
             }
 
             conn.commit();
-
-            modelview.add("volList", Vol.getAll(conn));
-            modelview.add("villeList", Ville.getAll(conn));
-            modelview.add("avionList", Avion.getAll(conn));
-            modelview.add("volSiegeList", Vol_siege.getAll(conn));
-            modelview.setUrl("./page/vol/vol.jsp");
+            return list();
         } catch (Exception e) {
             try {
                 conn.rollback();
@@ -153,10 +150,7 @@ public class VolController {
             
             conn.commit();
             
-            modelview.add("villeList", Ville.getAll(conn));
-            modelview.add("avionList", Avion.getAll(conn));
-            modelview.add("volList", Vol.getAll(conn));
-            modelview.add("volSiegeList", Vol_siege.getAll(conn));
+            return list();
         } catch (Exception e) {
             try {
                 conn.rollback();
@@ -181,12 +175,14 @@ public class VolController {
     public ModelView update(@Param("id_vol") String id_vol) {
         ModelView modelview = new ModelView("./page/vol/formulaireVol.jsp");
         Connection conn = new Connexion().connect_to_postgres();
+        System.out.println(id_vol);
         try {
             modelview.add("villeList", Ville.getAll(conn));
             modelview.add("avionList", Avion.getAll(conn));
             modelview.add("typeSiegeList", Type_siege.getAll(conn));
             modelview.add("vol",Vol.getById(id_vol, conn));
             modelview.add("vol_siege",Vol_siege.getByVolId(id_vol, conn));
+            modelview.add("classeList", Classe.getAll(conn));
         } catch (Exception e) {
             
         }finally {
@@ -223,11 +219,7 @@ public class VolController {
 
             conn.commit();
 
-            modelview.add("volList", Vol.getAll(conn));
-            modelview.add("villeList", Ville.getAll(conn));
-            modelview.add("avionList", Avion.getAll(conn));
-            modelview.add("volSiegeList", Vol_siege.getAll(conn));
-            modelview.setUrl("./page/vol/vol.jsp");
+            return list();
         } catch (Exception e) {
             try {
                 conn.rollback();

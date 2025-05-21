@@ -99,7 +99,6 @@
         try {
             String query = "INSERT INTO vol (date_vol,id_ville,id_avion,id_ville_1) VALUES (?,?,?,?) RETURNING id_vol";
             statement = connection.prepareStatement(query);
-			System.out.println(getDate_vol());
             statement.setTimestamp(1, Timestamp.valueOf(getDate_vol()));
             statement.setString(2, this.ville.getId_ville());
             statement.setString(3, this.avion.getId_avion());

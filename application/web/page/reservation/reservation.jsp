@@ -3,11 +3,13 @@
 <%@ page import="java.util.List" %>
 <%
 	List<Reservation> reservationList = null;
+	List<Reservation_classe> reservation_classeList = null;
 	String message = null;
 
 	try {
 		reservationList = (List<Reservation>) request.getAttribute("reservationList");
-			message = (String) request.getAttribute("message");
+		reservation_classeList = (List<Reservation_classe>) request.getAttribute("reservationClasseList");
+		message = (String) request.getAttribute("message");
 	} catch (Exception e) {
 		// Log the error or handle it appropriately
 		e.printStackTrace();
@@ -30,8 +32,6 @@
 							<th>Id_reservation</th>
 							<th>Date_reservation</th>
 							<th>Prix</th>
-							<th>type_siege</th>
-							<th>vol</th>
 							<th>Actions</th>
 						</tr>
 					</thead>
@@ -39,11 +39,9 @@
 						<% if (reservationList != null) { %>
 							<% for (Reservation reservationvalue : reservationList) { %>
 								<tr>
-								<td><%= reservationvalue.getId_reservation() %></td>
+								<td><a href="detail?id_reservation=<%= reservationvalue.getId_reservation() %>"><%= reservationvalue.getId_reservation() %></a></td>
 								<td><%= reservationvalue.getDate_reservation() %></td>
 								<td><%= reservationvalue.getPrix() %></td>
-								<td><%= reservationvalue.getType_siege().getLibelle() %></td>
-								<td><%= reservationvalue.getVol().getLibelle() %></td>
 								<td> 									
 									<a href="anul_reservation?id_reservation=<%= reservationvalue.getId_reservation() %>" class="btn btn-danger btn-sm"
 									onclick="return confirm('Êtes-vous sûr de vouloir annuler ce reservation ?')">annuler</a></td>

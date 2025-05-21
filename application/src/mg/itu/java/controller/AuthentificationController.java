@@ -5,12 +5,11 @@ import framework.Annotation.Controller;
 import framework.Annotation.Url;
 import framework.Annotation.Param;
 import framework.Annotation.Post;
-import framework.Annotation.Email;
-import framework.Annotation.NotNull;
 import framework.Annotation.Valid;
 import mg.itu.java.database.Connexion;
 import framework.FileUpload;
 import mg.itu.java.model.Utilisateur;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
 
@@ -42,6 +41,7 @@ public class AuthentificationController {
         ModelView modelview = new ModelView("./page/user/login_utilisateur.jsp");
         session.delete("user");
         session.delete("auth");
+        session.delete("panier");
         return modelview;
     }
 
@@ -118,23 +118,18 @@ public class AuthentificationController {
         try {
             System.out.println(passeport.getPath());
             u.setPassport(passeport.getPath());
+            u.setMdp(BCrypt.hashpw(u.getMdp(), BCrypt.gensalt()));  
             u.insert(conn);
             modelview.setUrl("./page/user/login_utilisateur.jsp");
         } catch (Exception e) {
             e.printStackTrace();
             modelview.setUrl("./page/user/sign_up_utilisateur.jsp");
-                modelview.add("error","erreur happend");
-        }finally {
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
+            modelview.add("error", "Erreur lors de l'inscription");
+        } finally {
+            if (conn != null) try { conn.close(); } catch (Exception e) {}
+        }
         return modelview;
     }
+    
 
 }
