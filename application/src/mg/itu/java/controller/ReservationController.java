@@ -1,10 +1,10 @@
 package mg.itu.java.controller;
 
 import java.sql.Connection;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Base64;
 import java.util.List;
+
 
 import framework.ModelView;
 import framework.Annotation.Url;
@@ -12,9 +12,8 @@ import framework.Annotation.Param;
 import framework.Annotation.Controller;
 import mg.itu.java.database.Connexion;
 import mg.itu.java.dto.ReservationDTO;
-import mg.itu.java.model.Annulation_reservation;
 import mg.itu.java.model.Classe;
-import mg.itu.java.model.Critere_reservation;
+import mg.itu.java.model.DetailsReservation;
 import mg.itu.java.model.Reservation;
 import mg.itu.java.model.ReservationAvecClasse;
 import mg.itu.java.model.Reservation_classe;
@@ -24,6 +23,15 @@ import mg.itu.java.model.Vol;
 import framework.Session;
 
 import framework.Annotation.Post;
+import framework.Annotation.RestApi;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.element.Cell;
+import java.io.ByteArrayOutputStream;
+
 
 @Controller
 public class ReservationController {
@@ -184,10 +192,8 @@ public class ReservationController {
     public ModelView annulation(@Param("session") Session session,@Param("id_reservation") String id_reservation) {
         ModelView modelview = new ModelView("./page/reservation/reservation.jsp");
         Connection conn = new Connexion().connect_to_postgres();
-        List<String> retard = new ArrayList<String>();
         Reservation reservation =null;
         try {
-            List<ReservationAvecClasse> panier = ReservationAvecClasse.getByReservation(id_reservation,conn);
             reservation = Reservation.getById(id_reservation, conn);
             if (!Reservation.getRetardAnnulation(reservation,conn)) {
                 Reservation.delete(id_reservation, conn);
@@ -213,4 +219,71 @@ public class ReservationController {
         return modelview;
     }
     
+
+    @Url("/export_pdf")
+    @RestApi
+    public ModelView exportPdf(@Param("reservationId") String reservationId) {
+        ModelView modelview = new ModelView();
+        Connection conn = new Connexion().connect_to_postgres();
+        try {
+            Reservation reservation = Reservation.getById(reservationId, conn);
+            if (reservation == null) {
+                modelview.add("success", false);
+                modelview.add("response", "Réservation non trouvée");
+                return modelview;
+            }
+
+            // Fetch details
+            List<DetailsReservation> details = reservation.getDetails(conn);
+
+            // Generate PDF
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PdfWriter writer = new PdfWriter(baos);
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf);
+
+            // Add reservation info
+            document.add(new Paragraph("Détails de la Réservation")
+                    .setFontSize(16).setBold());
+            document.add(new Paragraph("ID Réservation: " + reservation.getId_reservation()));
+            document.add(new Paragraph("Date de Réservation: " + reservation.getDate_reservation()));
+            document.add(new Paragraph("Prix: " + reservation.getPrix() + " €"));
+            document.add(new Paragraph("Vol: " + reservation.getVol().getId_vol()));
+
+            // Add details table
+            document.add(new Paragraph("\nDétails des Passagers").setFontSize(14).setBold());
+            Table table = new Table(new float[]{200, 100, 200});
+            table.addHeaderCell(new Cell().add(new Paragraph("Nom")));
+            table.addHeaderCell(new Cell().add(new Paragraph("Âge")));
+            table.addHeaderCell(new Cell().add(new Paragraph("Passeport")));
+
+            for (DetailsReservation detail : details) {
+                table.addCell(new Cell().add(new Paragraph(detail.getNom())));
+                table.addCell(new Cell().add(new Paragraph(detail.getAge() + " ans")));
+                table.addCell(new Cell().add(new Paragraph(detail.getPassport() != null ? "Fichier téléchargé" : "Aucun fichier")));
+            }
+
+            document.add(table);
+            document.close();
+
+            // Add PDF data and metadata to ModelView
+            modelview.add("success", true);
+            modelview.add("data", Base64.getEncoder().encodeToString(baos.toByteArray()));
+            modelview.add("contentType", "application/pdf");
+            modelview.add("filename", "reservation_RES-1.pdf");
+            modelview.add("response", "PDF généré avec succès");
+        } catch (Exception e) {
+            e.printStackTrace();
+            modelview.add("response", e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return modelview;
+    }
 }

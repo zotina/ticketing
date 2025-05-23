@@ -269,5 +269,32 @@ public class Reservation{
 		}
         return false;
     }
-	
+		
+	public List<DetailsReservation> getDetails(Connection connection) throws Exception {
+        List<DetailsReservation> details = new ArrayList<>();
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        try {
+            String query = "SELECT id_details_reservation, nom, age, passport FROM details_reservation  WHERE id_reservation = ?";
+            statement = connection.prepareStatement(query);
+            statement.setString(1, id_reservation);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                DetailsReservation detail = new DetailsReservation();
+                detail.setIdDetailsReservation(resultSet.getString("id_details_reservation"));
+                detail.setNom(resultSet.getString("nom"));
+                detail.setAge(resultSet.getInt("age"));
+                detail.setPassport(resultSet.getString("passport"));
+                detail.setIdReservation(id_reservation);
+                details.add(detail);
+            }
+            return details;
+        } catch (SQLException e) {
+			e.printStackTrace();
+            throw new Exception("Erreur lors de la récupération des détails: " + e.getMessage());
+        } finally {
+            if (resultSet != null) try { resultSet.close(); } catch (SQLException e) {}
+            if (statement != null) try { statement.close(); } catch (SQLException e) {}
+        }
+    }
 }
